@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>CSV Line Chart</title>
+ <!--<script src="https://cdn.jsdelivr.net/npm/chart.js/dist/Chart.min.js"></script>-->
+<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+</head>
+
+<!--html-->
+<body>
+ <canvas id="myChart"></canvas>
+ <script>
+
+//js
+ async function getData() {
+   try {
+     const response = await fetch("shooting.csv");
+     const data = await response.text();
+     const rows = data.split("\n").slice(1);
+
+
+     const years = [];
+     const globalTemps = [];
+
+
+     rows.forEach((elem) => {
+       const row = elem.split(",");
+       const bourough = row[5];
+       const temp = row[11];
+       years.push(year);
+       globalTemps.push(Number(temp)+14);
+     });
+
+
+     createChart(years, globalTemps);
+   } catch (error) {
+     console.error("Error fetching data:", error);
+   }
+ }
+
+
+ function createChart(labels, data) {
+   const ch = document.getElementById('myChart');
+   const myChart = new Chart(ch, {
+     type: 'bar',
+     data: {
+       labels: labels,
+       datasets: [{
+         label: 'NYPD shooting',
+         data: data,
+         borderColor: 'rgba(75, 192, 192, 1)',
+         borderWidth: 1,
+         fill: false,
+         fontSize: 50,
+       }]
+     },
+     options: {
+       scales: {
+         x: [{
+           type: 'linear',
+           position: 'bottom'
+         }]
+       }
+     }
+   });
+ }
+ getData();
+</script>
+
+
+</body>
+
+
+</html>
