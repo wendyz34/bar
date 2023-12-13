@@ -6,8 +6,8 @@
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
  <title>CSV Line Chart</title>
- <!--<script src="https://cdn.jsdelivr.net/npm/chart.js/dist/Chart.min.js"></script>-->
-<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+ <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/Chart.min.js"></script>
+<!--<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>-->
 </head>
 
 <!--html-->
@@ -23,47 +23,55 @@
      const rows = data.split("\n").slice(1);
 
 
-     const years = [];
-     const globalTemps = [];
+     const area = [];
+     const murderStat = [];
 
 
      rows.forEach((elem) => {
        const row = elem.split(",");
-       const bourough = row[5];
-       const temp = row[11];
-       years.push(year);
-       globalTemps.push(Number(temp)+14);
+       const bourough = row[3];
+       const count = row[9];
+       area.push(bourough);
+       murderStat.push(Number(count));
      });
 
 
-     createChart(years, globalTemps);
+     createChart(area, murderStat);
    } catch (error) {
      console.error("Error fetching data:", error);
    }
  }
-
-
- function createChart(labels, data) {
+function createChart(labels, data) {
+    const bourough = [
+       'BRONX',
+       'BROOKLYN',
+       'MAHATTAN',
+       'QUEENS',
+       'STATEN ISLAND'
+    ];
    const ch = document.getElementById('myChart');
+   const label = Utils.bourough({count: 5});
    const myChart = new Chart(ch, {
-     type: 'bar',
+     type: 'line',
      data: {
        labels: labels,
-       datasets: [{
          label: 'NYPD shooting',
          data: data,
-         borderColor: 'rgba(75, 192, 192, 1)',
-         borderWidth: 1,
-         fill: false,
-         fontSize: 50,
-       }]
+        /* backgroundColor: [
+        'rgba(255, 99, 132, 0.2)',
+        'rgba(255, 159, 64, 0.2)',
+        'rgba(255, 205, 86, 0.2)',
+        'rgba(75, 192, 192, 0.2)',
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(153, 102, 255, 0.2)',
+        'rgba(201, 203, 207, 0.2)'
+        ],*/
      },
      options: {
        scales: {
-         x: [{
-           type: 'linear',
-           position: 'bottom'
-         }]
+        y: {
+             beginAtZero: true
+        }
        }
      }
    });
