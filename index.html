@@ -1,86 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
 <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>CSV Line Chart</title>
- <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/Chart.min.js"></script>
-<!--<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Bar Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/Chart.min.js"></script>
 </head>
 
-<!--html-->
 <body>
- <canvas id="myChart"></canvas>
- <script>
+    <canvas id="myChart"></canvas>
+    <script>
+        async function getData() {
+    try {
+        const response = await fetch("shooting.csv");
+        const data = await response.text();
+        const rows = data.split("\n").slice(1);
 
-//js
- async function getData() {
-   try {
-     const response = await fetch("shooting.csv");
-     const data = await response.text();
-     const rows = data.split("\n").slice(1);
+        const boroughs = [];
+
+        rows.forEach((elem, index) => {
+            const row = elem.split(",");
+            if (row.length >= 4) {
+                const borough = row[3].trim();
+                if (borough) {
+                    boroughs.push(borough);
+                }
+            } else {
+                console.log(`Skipped row ${index + 2} due to insufficient columns. Row content: ${elem}`);
+            }
+        });
+
+        console.log("Boroughs:", boroughs);
+
+        // Count occurrences of each borough
+        const counts = {};
+        boroughs.forEach(borough => {
+            counts[borough] = (counts[borough] || 0) + 1;
+        });
+
+        console.log("Counts:", counts);
+
+        // Separate boroughs and counts
+        const uniqueBoroughs = Object.keys(counts);
+        const incidentCount = uniqueBoroughs.map(borough => counts[borough]);
+
+        createChart(uniqueBoroughs, incidentCount);
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
+}
 
 
-     const area = [];
-     const murderStat = [];
+        const boroughColors = {
+            "BRONX": "rgba(255, 99, 132, 0.7)",
+            "BROOKLYN": "rgba(54, 162, 235, 0.7)",
+            "MANHATTAN": "rgba(255, 206, 86, 0.7)",
+            "QUEENS": "rgba(75, 192, 192, 0.7)",
+            "STATEN ISLAND": "rgba(153, 102, 255, 0.7)"
+        };
 
+        function createChart(labels, data) {
+            const backgroundColors = labels.map(borough => boroughColors[borough]);
 
-     rows.forEach((elem) => {
-       const row = elem.split(",");
-       const bourough = row[3];
-       const count = row[9];
-       area.push(bourough);
-       murderStat.push(Number(count));
-     });
-
-
-     createChart(area, murderStat);
-   } catch (error) {
-     console.error("Error fetching data:", error);
-   }
- }
-function createChart(labels, data) {
-    const bourough = [
-       'BRONX',
-       'BROOKLYN',
-       'MAHATTAN',
-       'QUEENS',
-       'STATEN ISLAND'
-    ];
-   const ch = document.getElementById('myChart');
-   const label = Utils.bourough({count: 5});
-   const myChart = new Chart(ch, {
-     type: 'line',
-     data: {
-       labels: labels,
-         label: 'NYPD shooting',
-         data: data,
-        /* backgroundColor: [
-        'rgba(255, 99, 132, 0.2)',
-        'rgba(255, 159, 64, 0.2)',
-        'rgba(255, 205, 86, 0.2)',
-        'rgba(75, 192, 192, 0.2)',
-        'rgba(54, 162, 235, 0.2)',
-        'rgba(153, 102, 255, 0.2)',
-        'rgba(201, 203, 207, 0.2)'
-        ],*/
-     },
-     options: {
-       scales: {
-        y: {
-             beginAtZero: true
+            const ctx = document.getElementById('myChart').getContext('2d');
+            const myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Number of Incidents',
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        borderColor: backgroundColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
         }
-       }
-     }
-   });
- }
- getData();
-</script>
 
-
+        getData();
+    </script>
 </body>
 
-
 </html>
+
+
